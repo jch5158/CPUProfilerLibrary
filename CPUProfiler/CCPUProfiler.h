@@ -61,7 +61,7 @@ public:
 		UINT64 kernelDeltaTime = kernelTime.QuadPart - mProcessorLastKernelTime.QuadPart;
 		UINT64 userDeltaTime   = userTime.QuadPart - mProcessorLastUserTime.QuadPart;
 
-		UINT64 totalDeltaTime = kernelDeltaTime + userDeltaTime;
+		UINT64 totalDeltaTime  = kernelDeltaTime + userDeltaTime;
 
 		if (totalDeltaTime == 0)
 		{
@@ -76,37 +76,42 @@ public:
 			mProcessorUserPercentage   = (FLOAT)((DOUBLE)(userDeltaTime) / (DOUBLE)totalDeltaTime * 100.0f);
 		}
 
-		mProcessorLastIdleTime   = idleTime;
-		mProcessorLastKernelTime = kernelTime;
-		mProcessorLastUserTime   = userTime;
+		mProcessorLastIdleTime		   = idleTime;
+		mProcessorLastKernelTime	   = kernelTime;
+		mProcessorLastUserTime		   = userTime;
 	}
 
 
 	void UpdateProcessProfile(void)
 	{
-		ULARGE_INTEGER noneUse = { 0, };
-		ULARGE_INTEGER nowTime = { 0, };
+		ULARGE_INTEGER noneUse    = { 0, };
+		ULARGE_INTEGER nowTime    = { 0, };
 
 		ULARGE_INTEGER kernelTime = { 0, };
-		ULARGE_INTEGER userTime = { 0, };
+		ULARGE_INTEGER userTime   = { 0, };
 
+
+		// 현재 시간을 100나노 세컨드 해상도를 가진
 		GetSystemTimeAsFileTime((LPFILETIME)&nowTime);
 
 		GetProcessTimes(mProcessHandle, (LPFILETIME)&noneUse, (LPFILETIME)&noneUse, (LPFILETIME)&kernelTime, (LPFILETIME)&userTime);
 
-		UINT64 deltaTime       = nowTime.QuadPart - mProcessLastTime.QuadPart;
-		UINT64 kernelDeltaTime = kernelTime.QuadPart - mProcessLastKernelTime.QuadPart;
-		UINT64 userDeltaTime   = userTime.QuadPart - mProcessLastUserTime.QuadPart;
 
-		UINT64 totalDeltaTime = kernelDeltaTime + userDeltaTime;
-
-		mProcessTotalPercentage = (FLOAT)((DOUBLE)totalDeltaTime / (DOUBLE)mNumberOfProcessors / (DOUBLE)deltaTime * 100.0f);
-		mProcessKernelPercentage = (FLOAT)((DOUBLE)kernelDeltaTime / (DOUBLE)mNumberOfProcessors / (DOUBLE)deltaTime * 100.0f);
-		mProcessUserPercentage = (FLOAT)((DOUBLE)userDeltaTime / (DOUBLE)mNumberOfProcessors / (DOUBLE)deltaTime * 100.0f);
-
-		mProcessLastTime = nowTime;
-		mProcessLastKernelTime = kernelTime;
-		mProcessLastUserTime = userTime;
+		// 지난시간에서 얼마만큼의 시간이 지났는지 확인한다.
+		UINT64 deltaTime		  = nowTime.QuadPart - mProcessLastTime.QuadPart;
+		UINT64 kernelDeltaTime	  = kernelTime.QuadPart - mProcessLastKernelTime.QuadPart;
+		UINT64 userDeltaTime	  = userTime.QuadPart - mProcessLastUserTime.QuadPart;
+								  
+		UINT64 processDeltaTime   = kernelDeltaTime + userDeltaTime;
+								  
+								  
+		mProcessTotalPercentage	  = (FLOAT)((DOUBLE)processDeltaTime / (DOUBLE)mNumberOfProcessors / (DOUBLE)deltaTime * 100.0f);
+		mProcessKernelPercentage  = (FLOAT)((DOUBLE)kernelDeltaTime / (DOUBLE)mNumberOfProcessors / (DOUBLE)deltaTime * 100.0f);	
+		mProcessUserPercentage	  = (FLOAT)((DOUBLE)userDeltaTime / (DOUBLE)mNumberOfProcessors / (DOUBLE)deltaTime * 100.0f);
+								  
+		mProcessLastTime		  = nowTime;
+		mProcessLastKernelTime	  = kernelTime;
+		mProcessLastUserTime	  = userTime;
 	}
 
 
