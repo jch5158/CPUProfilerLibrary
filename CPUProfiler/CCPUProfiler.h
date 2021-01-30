@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+#include <Windows.h>
 
 
 class CCPUProfiler
@@ -95,10 +97,10 @@ public:
 		GetSystemTimeAsFileTime((LPFILETIME)&nowTime);
 
 		GetProcessTimes(mProcessHandle, (LPFILETIME)&noneUse, (LPFILETIME)&noneUse, (LPFILETIME)&kernelTime, (LPFILETIME)&userTime);
-
-
+		
 		// 지난시간에서 얼마만큼의 시간이 지났는지 확인한다.
 		UINT64 deltaTime		  = nowTime.QuadPart - mProcessLastTime.QuadPart;
+
 		UINT64 kernelDeltaTime	  = kernelTime.QuadPart - mProcessLastKernelTime.QuadPart;
 		UINT64 userDeltaTime	  = userTime.QuadPart - mProcessLastUserTime.QuadPart;
 								  
@@ -157,6 +159,8 @@ private:
 
 		// 생성자에서 한 번 호출해준다.
 		UpdateProcessorsProfile();
+
+		UpdateProcessProfile();
 	}
 
 
