@@ -8,7 +8,7 @@ class CCPUProfiler
 {
 public:
 
-	static CCPUProfiler* GetInstance(HANDLE processHandle = INVALID_HANDLE_VALUE)
+	static inline CCPUProfiler* GetInstance(HANDLE processHandle = INVALID_HANDLE_VALUE)
 	{
 		static CCPUProfiler cpuProfiler(processHandle);
 
@@ -16,38 +16,38 @@ public:
 	}
 
 
-	FLOAT GetProcessorTotalPercentage(void)
+	inline FLOAT GetProcessorTotalPercentage(void)
 	{
 		return mProcessorTotalPercentage;
 	}
 
-	FLOAT GetProcessorKernelPercentage(void)
+	inline FLOAT GetProcessorKernelPercentage(void)
 	{
 		return mProcessorKernelPercentage;
 	}
 
-	FLOAT GetProcessorUserPercentage(void)
+	inline FLOAT GetProcessorUserPercentage(void)
 	{
 		return mProcessorUserPercentage;
 	}
 
-	FLOAT GetProcessTotalPercentage(void)
+	inline FLOAT GetProcessTotalPercentage(void)
 	{
 		return mProcessTotalPercentage;
 	}
 
-	FLOAT GetProcessKernelPercentage(void)
+	inline FLOAT GetProcessKernelPercentage(void)
 	{
 		return mProcessKernelPercentage;
 	}
 
-	FLOAT GetProcessUserPercentage(void)
+	inline FLOAT GetProcessUserPercentage(void)
 	{
 		return mProcessUserPercentage;
 	}
 
 
-	void UpdateProcessorsProfile(void)
+	inline void UpdateProcessorsProfile(void)
 	{
 		ULARGE_INTEGER idleTime   = { 0, };
 		ULARGE_INTEGER kernelTime = { 0, };
@@ -59,11 +59,11 @@ public:
 			return;
 		}
 
-		UINT64 idleDeltaTime   = idleTime.QuadPart - mProcessorLastIdleTime.QuadPart;
-		UINT64 kernelDeltaTime = kernelTime.QuadPart - mProcessorLastKernelTime.QuadPart;
-		UINT64 userDeltaTime   = userTime.QuadPart - mProcessorLastUserTime.QuadPart;
+		LONGLONG idleDeltaTime   = idleTime.QuadPart - mProcessorLastIdleTime.QuadPart;
+		LONGLONG kernelDeltaTime = kernelTime.QuadPart - mProcessorLastKernelTime.QuadPart;
+		LONGLONG userDeltaTime   = userTime.QuadPart - mProcessorLastUserTime.QuadPart;
 
-		UINT64 totalDeltaTime  = kernelDeltaTime + userDeltaTime;
+		LONGLONG totalDeltaTime  = kernelDeltaTime + userDeltaTime;
 
 		if (totalDeltaTime == 0)
 		{
@@ -84,7 +84,7 @@ public:
 	}
 
 
-	void UpdateProcessProfile(void)
+	inline void UpdateProcessProfile(void)
 	{
 		ULARGE_INTEGER noneUse    = { 0, };
 		ULARGE_INTEGER nowTime    = { 0, };
@@ -99,12 +99,12 @@ public:
 		GetProcessTimes(mProcessHandle, (LPFILETIME)&noneUse, (LPFILETIME)&noneUse, (LPFILETIME)&kernelTime, (LPFILETIME)&userTime);
 		
 		// 지난시간에서 얼마만큼의 시간이 지났는지 확인한다.
-		UINT64 deltaTime		  = nowTime.QuadPart - mProcessLastTime.QuadPart;
+		LONGLONG deltaTime		  = nowTime.QuadPart - mProcessLastTime.QuadPart;
 
-		UINT64 kernelDeltaTime	  = kernelTime.QuadPart - mProcessLastKernelTime.QuadPart;
-		UINT64 userDeltaTime	  = userTime.QuadPart - mProcessLastUserTime.QuadPart;
+		LONGLONG kernelDeltaTime	  = kernelTime.QuadPart - mProcessLastKernelTime.QuadPart;
+		LONGLONG userDeltaTime	  = userTime.QuadPart - mProcessLastUserTime.QuadPart;
 								  
-		UINT64 processDeltaTime   = kernelDeltaTime + userDeltaTime;
+		LONGLONG processDeltaTime   = kernelDeltaTime + userDeltaTime;
 								  
 								  
 		mProcessTotalPercentage	  = (FLOAT)((DOUBLE)processDeltaTime / (DOUBLE)mNumberOfProcessors / (DOUBLE)deltaTime * 100.0f);
